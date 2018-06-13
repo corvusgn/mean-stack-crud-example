@@ -7,9 +7,9 @@ properties([
     string(name: 'registryURL', defaultValue: ''),
     string(name: 'registryName', defaultValue: 'unicanova'),
     string(name: 'imageName', defaultValue: 'mean'),
-    string(name: 'TEST', defaultValue: 'false'),
     string(name: 'buildBranchName', defaultValue: ''),
-    string(name: 'gitCredentials', defaultValue: '42345-3453-53756-25678589')
+    string(name: 'gitCredentials', defaultValue: '42345-3453-53756-25678589'),
+    booleanParam(name: 'TEST', defaultValue: false)
   ]),
 
   pipelineTriggers([
@@ -42,7 +42,7 @@ node {
     } 
 
     stage('Test build') {
-         if (env.TEST) {
+         if (params.TEST) {
              try {
                  sh "docker build -f Dockerfile.test -t ${imageName}:test ."
              }
