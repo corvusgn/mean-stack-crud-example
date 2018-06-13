@@ -7,6 +7,7 @@ properties([
     string(name: 'registryURL', defaultValue: ''),
     string(name: 'registryName', defaultValue: 'unicanova'),
     string(name: 'imageName', defaultValue: 'mean'),
+    string(name: 'TEST', defaultValue: 'false'),
     string(name: 'buildBranchName', defaultValue: ''),
     string(name: 'gitCredentials', defaultValue: '42345-3453-53756-25678589')
   ]),
@@ -40,6 +41,24 @@ node {
                 url: params.gitRepo]]])
     } 
 
+    stage('Test build') {
+         if (env.TEST) {
+             try {
+                 sh "docker build -f Dockerfile.test -t ${imageName}:test ."
+             }
+
+            catch (err) {
+                 println "an error has occurred"
+                 def images = sh(returnStdout: true, script: '/usr/bin/docker images | grep "^<none>" | awk \'{print $3}\'')
+                 sh("/usr/bin/docker rmi -f $images")
+                 throw err;
+            }         
+         }
+         else {
+             println "To turn on test stage set Test=true"
+         }
+    }
+
     stage('Build image') {
         def dateFormat = new SimpleDateFormat("yyyyMMdd")
         def timeStamp = new Date()
@@ -51,7 +70,7 @@ node {
                 def image = docker.build("${imageFullName}:${imageTag}")
                 image.push()
                 image.push("latest")
-                sh "docker rmi -f swagger:test"
+                sh "docker rmi -f ${imageName}:test"
                 sh "docker rmi -f ${imageFullName}:${imageTag}"
                 sh "docker rmi -f ${imageFullName}:latest"
             }
@@ -64,5 +83,4 @@ node {
             throw err;
         }
     }
-
 }
