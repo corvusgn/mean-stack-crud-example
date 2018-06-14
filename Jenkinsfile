@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat
 
 properties([
   parameters([
-    string(name: 'gitRepo', defaultValue: 'git@bitbucket.org:dmitriy-yevtushenko/mean-stack-crud-example.git'),
+    string(name: 'gitRepo', defaultValue: 'git@github.com:unicanova/mean-stack-crud-example.git'),
     string(name: 'realCommitSha', defaultValue: ''),
     string(name: 'registryURL', defaultValue: ''),
     string(name: 'registryName', defaultValue: 'unicanova'),
