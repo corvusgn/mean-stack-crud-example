@@ -4,8 +4,8 @@ properties([
   parameters([
     string(name: 'gitRepo', defaultValue: 'git@github.com:unicanova/mean-stack-crud-example.git'),
     string(name: 'realCommitSha', defaultValue: ''),
-    string(name: 'registryURL', defaultValue: ''),
-    string(name: 'registryName', defaultValue: 'unicanova'),
+    string(name: 'registryURL', defaultValue: 'https:/eu.gcr.io'),
+    string(name: 'registryName', defaultValue: 'gcr.io/trusty-gradient-182808'),
     string(name: 'imageName', defaultValue: 'mean'),
     string(name: 'buildBranchName', defaultValue: ''),
     string(name: 'gitCredentials', defaultValue: '42345-3453-53756-25678589'),
@@ -55,7 +55,7 @@ node {
             }         
          }
          else {
-             println "To turn on test stage set Test=true"
+             println "To turn on test stage set TEST"
          }
     }
 
@@ -63,17 +63,19 @@ node {
         def dateFormat = new SimpleDateFormat("yyyyMMdd")
         def timeStamp = new Date()
         def shortSha = commit.take(8)
-        try {         
-            withDockerRegistry([credentialsId: 'dockerhub', url: '']) {
-                def imageFullName = "${env.registryName}/${env.imageName}"
-                def imageTag = "${dateFormat.format(timeStamp)}-${branchName}-${shortSha}"
-                def image = docker.build("${imageFullName}:${imageTag}")
-                image.push()
-                image.push("latest")
-                sh "docker rmi -f ${imageName}:test"
-                sh "docker rmi -f ${imageFullName}:${imageTag}"
-                sh "docker rmi -f ${imageFullName}:latest"
+        def imageFullName = "${env.registryName}/${env.imageName}"
+        def imageTag = "${dateFormat.format(timeStamp)}-${branchName}-${shortSha}"
+        try {
+            def image = docker.build("${imageFullName}:${imageTag}")
+            sh "docker tag ${imageFullName}:${imageTag} ${imageFullName}:latest"
+            withCredentials([file(credentialsId: 'secret-gce-creds', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                sh "gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://gcr.io"
+                sh "gcloud docker -- push ${imageFullName}:${imageTag}"
+                sh "gcloud docker -- push ${imageFullName}:latest"
             }
+            sh "docker rmi -f ${imageName}:test"
+            sh "docker rmi -f ${imageFullName}:${imageTag}"
+            sh "docker rmi -f ${imageFullName}:latest"
         }
       
         catch (err) {
