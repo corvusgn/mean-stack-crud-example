@@ -15,10 +15,6 @@ properties([
 
   pipelineTriggers([
      [$class: 'GenericTrigger',
-         genericVariables: [
-             [key: 'triggerBranchName', value: '$.push.changes[:1].old.name', expressionType: 'JSONPath', regexpFilter: '[^a-zA-Z0-9_.-]'],
-             [key: 'newCommitSha', value: '$.push.changes[:1].commits[:1].hash', expressionType: 'JSONPath', regexpFilter: '[^a-zA-Z0-9_.-]']
-         ],
          printContributedVariables: true,
          printPostContent: true,]
     ])
