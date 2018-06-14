@@ -14,6 +14,11 @@ properties([
 
   pipelineTriggers([
      [$class: 'GenericTrigger',
+         genericVariables: [
+             [key: 'triggerBranchName', value: '$.repository.default_branch', expressionType: 'JSONPath', regexpFilter: '[^a-zA-Z0-9_.-]'],
+             [key: 'newCommitSha', value: '$.after', expressionType: 'JSONPath', regexpFilter: '[^a-zA-Z0-9_.-]']
+         ],
+
          printContributedVariables: true,
          printPostContent: true,]
     ])
