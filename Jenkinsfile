@@ -11,6 +11,10 @@ properties([
     string(name: 'buildBranchName', defaultValue: ''),
     string(name: 'gitCredentials', defaultValue: '42345-3453-53756-25678589'),
     string(name: 'releaseName', defaultValue: 'blockchain-app'),
+    string(name: 'googleContainerRegistryCreds', defaultValue: 'secret-gce-creds'),
+    string(name: 'googleKuberDeployer', defaultValue: 'kubernetes_secret'),
+    string(name: 'zone', defaultValue: 'europe-west1-b'),
+    string(name: 'projectName', defaultValue: 'trusty-gradient-182808'),
     booleanParam(name: 'TEST', defaultValue: false)
   ]),
 
@@ -72,9 +76,9 @@ node {
         try {
             def image = docker.build("${imageFullName}:${imageTag}")
             sh "docker tag ${imageFullName}:${imageTag} ${imageFullName}:latest"
-            withCredentials([file(credentialsId: 'secret-gce-creds', variable: 'GOOGLE_REGISTRY_PUSH_CREDS')]) {
+            withCredentials([file(credentialsId: params.googleContainerRegistryCreds, variable: 'GOOGLE_REGISTRY_PUSH_CREDS')]) {
                 sh "gcloud auth activate-service-account --key-file=\"$GOOGLE_REGISTRY_PUSH_CREDS\""
-                sh "gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://gcr.io"
+                sh "gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin ${env.registryURL}"
                 sh "gcloud docker -- push ${imageFullName}:${imageTag}"
                 sh "gcloud docker -- push ${imageFullName}:latest"
             }
@@ -101,9 +105,9 @@ node {
                 userRemoteConfigs: [[
                     credentialsId: params.gitCredentials,
                     url: params.gitChartRepo]]])
-            withCredentials([file(credentialsId: 'kubernetes_secret', variable: 'GOOGLE_KUBE_CREDS')]) {
+            withCredentials([file(credentialsId: params.googleKuberDeployer, variable: 'GOOGLE_KUBE_CREDS')]) {
                 sh "gcloud auth activate-service-account --key-file=\"$GOOGLE_KUBE_CREDS\""
-                sh "gcloud container clusters get-credentials omni-cluster --zone europe-west1-b --project trusty-gradient-182808"
+                sh "gcloud container clusters get-credentials omni-cluster --zone ${env.zone} --project ${env.projectName}"
                 sh "helm status ${env.releaseName} || helm install -n ${env.releaseName} --namespace ${branchName} . && helm upgrade --set mean.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} ."
             }
         }
