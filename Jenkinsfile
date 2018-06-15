@@ -21,7 +21,7 @@ properties([
   pipelineTriggers([
      [$class: 'GenericTrigger',
          genericVariables: [
-             [key: 'triggerBranchName', value: '$.repository.default_branch', expressionType: 'JSONPath', regexpFilter: '[^a-zA-Z0-9_.-]'],
+             [key: 'triggerBranchName', value: '$.ref', expressionType: 'JSONPath', regexpFilter: '[^a-zA-Z0-9_.-]'],
              [key: 'newCommitSha', value: '$.after', expressionType: 'JSONPath', regexpFilter: '[^a-zA-Z0-9_.-]']
          ],
          printContributedVariables: true,
@@ -30,7 +30,7 @@ properties([
 ])
 
 def branchName = env.buildBranchName ?: "${triggerBranchName}"
-def branchesArr = ["master", "dev", "qa"]
+def branchesArr = ["refs/heads/master", "refs/heads/dev", "refs/heads/qa"]
 echo "${branchName}"
 if(! branchName in branchesArr) {
    echo "Aborting Build branch isn't master, with current settings, only master branch can be build"
@@ -98,7 +98,7 @@ node {
         }
     }
 
-    if ( "${branchName}" != "master" ) {
+    if ( "${branchName}" != "refs/heads/master" ) {
         stage('Upgrade chart') {
             checkout ( [$class: 'GitSCM',
                 branches: [[name: '*/master']],
