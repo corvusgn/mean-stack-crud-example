@@ -15,7 +15,7 @@ properties([
     string(name: 'googleKuberDeployer', defaultValue: 'kubernetes_secret'),
     string(name: 'zone', defaultValue: 'europe-west1-b'),
     string(name: 'projectName', defaultValue: 'trusty-gradient-182808'),
-    booleanParam(name: 'TEST', defaultValue: false),
+    booleanParam(name: 'TEST', defaultValue: false)
   ]),
 
   pipelineTriggers([
