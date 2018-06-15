@@ -77,9 +77,6 @@ node {
                 sh "gcloud docker -- push ${imageFullName}:${imageTag}"
                 sh "gcloud docker -- push ${imageFullName}:latest"
             }
-            sh "docker rmi -f ${imageName}:test"
-            sh "docker rmi -f ${imageFullName}:${imageTag}"
-            sh "docker rmi -f ${imageFullName}:latest"
         }
       
         catch (err) {
@@ -87,6 +84,12 @@ node {
             def images = sh(returnStdout: true, script: '/usr/bin/docker images | grep "^<none>" | awk \'{print $3}\'')
             sh("/usr/bin/docker rmi -f $images")
             throw err;
+        }
+
+        finally {
+            sh "docker rmi -f ${imageName}:test"
+            sh "docker rmi -f ${imageFullName}:${imageTag}"
+            sh "docker rmi -f ${imageFullName}:latest"
         }
     }
 
