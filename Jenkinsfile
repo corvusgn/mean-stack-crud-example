@@ -26,8 +26,9 @@ properties([
 ])
 
 def branchName = env.buildBranchName ?: "${triggerBranchName}"
-
-if( "${branchName}" != "master" ) {
+def branchesArr = ["master", "dev", "qa"]
+echo "${branchName}"
+if(! branchName in branchesArr) {
    echo "Aborting Build branch isn't master, with current settings, only master branch can be build"
    currentBuild.result = 'ABORTED'
    return
@@ -93,16 +94,18 @@ node {
         }
     }
 
-    stage('Upgrade chart') {
-        checkout ( [$class: 'GitSCM',
-            branches: [[name: '*/master']],
-            userRemoteConfigs: [[
-                credentialsId: params.gitCredentials,
-                url: params.gitChartRepo]]])
-        withCredentials([file(credentialsId: 'kubernetes_secret', variable: 'GOOGLE_KUBE_CREDS')]) {
-            sh "gcloud auth activate-service-account --key-file=\"$GOOGLE_KUBE_CREDS\""
-            sh "gcloud container clusters get-credentials omni-cluster --zone europe-west1-b --project trusty-gradient-182808"
-            sh "helm status ${env.releaseName} || helm install -n ${env.releaseName} --namespace ${branchName} . && helm upgrade --set mean.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} ."
+    if ( "${branchName}" != "master" ) {
+        stage('Upgrade chart') {
+            checkout ( [$class: 'GitSCM',
+                branches: [[name: '*/master']],
+                userRemoteConfigs: [[
+                    credentialsId: params.gitCredentials,
+                    url: params.gitChartRepo]]])
+            withCredentials([file(credentialsId: 'kubernetes_secret', variable: 'GOOGLE_KUBE_CREDS')]) {
+                sh "gcloud auth activate-service-account --key-file=\"$GOOGLE_KUBE_CREDS\""
+                sh "gcloud container clusters get-credentials omni-cluster --zone europe-west1-b --project trusty-gradient-182808"
+                sh "helm status ${env.releaseName} || helm install -n ${env.releaseName} --namespace ${branchName} . && helm upgrade --set mean.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} ."
+            }
         }
     }
 }
