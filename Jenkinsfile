@@ -78,7 +78,7 @@ node {
             sh "docker tag ${imageFullName}:${imageTag} ${imageFullName}:latest"
             withCredentials([file(credentialsId: params.googleContainerRegistryCreds, variable: 'GOOGLE_REGISTRY_PUSH_CREDS')]) {
                 sh "gcloud auth activate-service-account --key-file=\"$GOOGLE_REGISTRY_PUSH_CREDS\""
-                sh "gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin ${env.registryURL}"
+                sh "gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://gcr.io"
                 sh "gcloud docker -- push ${imageFullName}:${imageTag}"
                 sh "gcloud docker -- push ${imageFullName}:latest"
             }
