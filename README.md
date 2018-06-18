@@ -55,6 +55,10 @@ You can start this job manually in Jenkins UI, for this you need to specify foll
 | registryName | Docker private registry name (It is necessary for the image to be in the repository) | gcr.io/trusty-gradient-182808 |
 | imageName | Docker image name | mean |
 | buildBranchName | the name of the branch from which to build docker image | not specified |
-| gitCredentials | credentials | 42345-3453-53756-25678589 |
+| gitCredentials | credentials id for git repository | 42345-3453-53756-25678589 |
 | releaseName | name of release | blockchain-app |
-| TEST | n/off test app in docker container | off |
+| googleContainerRegistryCreds | credentials for google container registry | secret-gce-creds |
+| googleKuberDeployer | credentials for deploy to kubernetes cluster | kubernetes_secret |
+| zone | zone of kubernetes cluster | europe-west1-b |
+| projectName | project name in GCE | trusty-gradient-182808 |
+| TEST | on/off test app in docker container (repositroy must contain second Dockerfile named Dockerfile.test) | off |
