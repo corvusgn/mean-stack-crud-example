@@ -108,7 +108,7 @@ node {
             withCredentials([file(credentialsId: params.googleKuberDeployer, variable: 'GOOGLE_KUBE_CREDS')]) {
                 sh "gcloud auth activate-service-account --key-file=\"$GOOGLE_KUBE_CREDS\""
                 sh "gcloud container clusters get-credentials omni-cluster --zone ${env.zone} --project ${env.projectName}"
-                sh "helm status ${env.releaseName} || helm install -n ${env.releaseName} --namespace ${branchName} . && helm upgrade --set mean.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} ."
+                sh "helm status ${env.releaseName} || helm install -n ${env.releaseName} --namespace ${branchName} . && helm upgrade --set {env.imageName}.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} ."
             }
         }
     }
