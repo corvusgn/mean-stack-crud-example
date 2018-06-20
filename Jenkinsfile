@@ -29,8 +29,8 @@ properties([
     ])
 ])
 
-def branchName = env.buildBranchName ?: "${triggerBranchName}"
-def branchesArr = ["refs/heads/master", "refs/heads/dev", "refs/heads/qa"]
+def branchName = env.buildBranchName.minus("refsheads") ?: "${triggerBranchName}"
+def branchesArr = ["master", "dev", "qa"]
 echo "${branchName}"
 if(! branchName in branchesArr) {
    echo "Aborting Build branch isn't master, with current settings, only master branch can be build"
@@ -98,7 +98,7 @@ node {
         }
     }
 
-    if ( "${branchName}" != "refs/heads/master" ) {
+    if ( "${branchName}" != "master" ) {
         stage('Upgrade chart') {
             checkout ( [$class: 'GitSCM',
                 branches: [[name: '*/master']],
