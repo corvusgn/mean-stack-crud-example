@@ -30,7 +30,7 @@ properties([
     ])
 ])
 
-def branchName = env.buildBranchName.minus("refsheads") ?: "${triggerBranchName}"
+def branchName = env.buildBranchName ?: "${triggerBranchName}".minus("refsheads")
 def branchesArr = ["master", "dev", "qa"]
 echo "${branchName}"
 if(! branchName in branchesArr) {
