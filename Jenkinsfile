@@ -3,14 +3,14 @@ import java.text.SimpleDateFormat
 
 properties([
   parameters([
-    string(name: 'gitRepo', defaultValue: 'git@github.com:unicanova/mean-stack-crud-example.git'),
-    string(name: 'gitChartRepo', defaultValue: 'git@github.com:unicanova/blockchain-app.git'),
+    string(name: 'gitRepo', defaultValue: 'https://github.com/unicanova/mean-stack-crud-example.git'),
+    string(name: 'gitChartRepo', defaultValue: 'https://github.com/unicanova/blockchain-app.git'),
     string(name: 'realCommitSha', defaultValue: ''),
     string(name: 'registryURL', defaultValue: 'https:/gcr.io'),
     string(name: 'registryName', defaultValue: 'gcr.io/trusty-gradient-182808'),
     string(name: 'imageName', defaultValue: 'mean'),
     string(name: 'buildBranchName', defaultValue: ''),
-    string(name: 'gitCredentials', defaultValue: '42345-3453-53756-25678589'),
+    string(name: 'gitCredentials', defaultValue: '5e6970fc-5378-45e4-9aee-4d1efe936756'),
     string(name: 'releaseName', defaultValue: 'blockchain-app'),
     string(name: 'googleContainerRegistryCreds', defaultValue: 'secret-gce-creds'),
     string(name: 'googleKuberDeployer', defaultValue: 'kubernetes_secret'),
@@ -30,8 +30,8 @@ properties([
     ])
 ])
 
-def branchName = env.buildBranchName ?: "${triggerBranchName}"
-def branchesArr = ["refs/heads/master", "refs/heads/dev", "refs/heads/qa"]
+def branchName = env.buildBranchName.minus("refsheads") ?: "${triggerBranchName}"
+def branchesArr = ["master", "dev", "qa"]
 echo "${branchName}"
 if(! branchName in branchesArr) {
    echo "Aborting Build branch isn't master, with current settings, only master branch can be build"
@@ -99,7 +99,7 @@ node {
         }
     }
 
-    if ( "${branchName}" != "refs/heads/master" ) {
+    if ( "${branchName}" != "master" ) {
         stage('Upgrade chart') {
             checkout ( [$class: 'GitSCM',
                 branches: [[name: '*/master']],
@@ -109,7 +109,7 @@ node {
             withCredentials([file(credentialsId: params.googleKuberDeployer, variable: 'GOOGLE_KUBE_CREDS')]) {
                 sh "gcloud auth activate-service-account --key-file=\"$GOOGLE_KUBE_CREDS\""
                 sh "gcloud container clusters get-credentials omni-cluster --zone ${env.zone} --project ${env.projectName}"
-                sh "helm status ${env.releaseName} || helm install -n ${env.releaseName} --namespace ${branchName} . && helm upgrade --set mean.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} ."
+                sh "helm status ${env.releaseName} || helm install -n ${env.releaseName} --namespace ${branchName} . && helm upgrade --set ${env.imageName}.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} ."
             }
         }
     }
