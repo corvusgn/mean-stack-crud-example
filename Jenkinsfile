@@ -9,7 +9,7 @@ properties([
     string(name: 'registryName', defaultValue: 'gcr.io/trusty-gradient-182808'),
     string(name: 'imageName', defaultValue: 'mean'),
     string(name: 'buildBranchName', defaultValue: ''),
-    string(name: 'gitCredentials', defaultValue: '42345-3453-53756-25678589'),
+    string(name: 'gitCredentials', defaultValue: '5e6970fc-5378-45e4-9aee-4d1efe936756'),
     string(name: 'releaseName', defaultValue: 'blockchain-app'),
     string(name: 'googleContainerRegistryCreds', defaultValue: 'secret-gce-creds'),
     string(name: 'googleKuberDeployer', defaultValue: 'kubernetes_secret'),
