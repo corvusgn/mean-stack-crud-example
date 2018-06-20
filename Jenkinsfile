@@ -2,8 +2,8 @@ import java.text.SimpleDateFormat
 
 properties([
   parameters([
-    string(name: 'gitRepo', defaultValue: 'git@github.com:unicanova/mean-stack-crud-example.git'),
-    string(name: 'gitChartRepo', defaultValue: 'git@github.com:unicanova/blockchain-app.git'),
+    string(name: 'gitRepo', defaultValue: 'https://github.com/unicanova/mean-stack-crud-example.git'),
+    string(name: 'gitChartRepo', defaultValue: 'https://github.com/unicanova/blockchain-app.git'),
     string(name: 'realCommitSha', defaultValue: ''),
     string(name: 'registryURL', defaultValue: 'https:/gcr.io'),
     string(name: 'registryName', defaultValue: 'gcr.io/trusty-gradient-182808'),
