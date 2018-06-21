@@ -1,6 +1,5 @@
 import java.text.SimpleDateFormat
 
-
 properties([
   parameters([
     string(name: 'gitRepo', defaultValue: 'https://github.com/unicanova/mean-stack-crud-example.git'),
@@ -109,12 +108,12 @@ node {
             withCredentials([file(credentialsId: params.googleKuberDeployer, variable: 'GOOGLE_KUBE_CREDS')]) {
                 sh '''#!/bin/bash
                         gcloud auth activate-service-account --key-file=\"$GOOGLE_KUBE_CREDS\"
-                        gcloud container clusters get-credentials omni-cluster --zone ${env.zone} --project ${env.projectName}
-                        if helm status ${env.releaseName}; then 
-                            helm install -n ${env.releaseName} --namespace ${branchName} .
+                        gcloud container clusters get-credentials omni-cluster --zone ${zone} --project ${projectName}
+                        if helm status ${releaseName}; then 
+                            helm install -n ${releaseName} --namespace ${branchName} .
                         else 
-                            helm upgrade --dry-run ${env.releaseName} .
-                            helm upgrade --set ${env.imageName}.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} --namespace ${branchName} .
+                            helm upgrade --dry-run ${releaseName} .
+                            helm upgrade --set ${imageName}.image.tag=${imageTag} ${releaseName} --namespace ${branchName} --namespace ${branchName} .
                         fi
                 '''
 //              sh "helm status ${env.releaseName} || helm install -n ${env.releaseName} --namespace ${branchName} . && helm upgrade --set ${env.imageName}.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} ."
