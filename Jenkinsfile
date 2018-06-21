@@ -106,9 +106,7 @@ node {
                     credentialsId: params.gitCredentials,
                     url: params.gitChartRepo]]])
             withCredentials([file(credentialsId: params.googleKuberDeployer, variable: 'GOOGLE_KUBE_CREDS')]) {
-                sh "gcloud auth activate-service-account --key-file=\"$GOOGLE_KUBE_CREDS\" && \
-                    gcloud container clusters get-credentials omni-cluster --zone ${env.zone} --project ${env.projectName} && \
-                    if helm status ${releaseName} > /dev/null; then helm upgrade --dry-run ${releaseName} . || helm upgrade --set ${imageName}.image.tag=${imageTag} ${releaseName} --namespace ${branchName} --namespace ${branchName} . else; helm install -n ${releaseName} --namespace ${branchName} .; fi"
+                sh "gcloud auth activate-service-account --key-file=\"$GOOGLE_KUBE_CREDS\" && gcloud container clusters get-credentials omni-cluster --zone ${env.zone} --project ${env.projectName} && if helm status ${releaseName} > /dev/null; then helm upgrade --dry-run ${releaseName} . || helm upgrade --set ${imageName}.image.tag=${imageTag} ${releaseName} --namespace ${branchName} --namespace ${branchName} . else; helm install -n ${releaseName} --namespace ${branchName} .; fi"
 //              sh "helm status ${env.releaseName} || helm install -n ${env.releaseName} --namespace ${branchName} . && helm upgrade --set ${env.imageName}.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} ."
             }
         }
