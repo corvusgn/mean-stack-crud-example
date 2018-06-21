@@ -107,7 +107,7 @@ node {
                     credentialsId: params.gitCredentials,
                     url: params.gitChartRepo]]])
             withCredentials([file(credentialsId: params.googleKuberDeployer, variable: 'GOOGLE_KUBE_CREDS')]) {
-                bash '''#!/bin/bash
+                sh '''#!/bin/bash
                         gcloud auth activate-service-account --key-file=\"$GOOGLE_KUBE_CREDS\"
                         gcloud container clusters get-credentials omni-cluster --zone ${env.zone} --project ${env.projectName}
                         if [[ helm status ${env.releaseName} ]]; then {
