@@ -111,7 +111,7 @@ node {
                     if helm status ${env.releaseName} >> /dev/null; then && \
                         helm upgrade --dry-run ${env.releaseName} . && \
                         helm upgrade --set ${env.imageName}.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} --namespace ${branchName} . && \
-                    else
+                    else && \
                         helm install -n ${env.releaseName} --namespace ${branchName} . && \
                     fi"
                 
