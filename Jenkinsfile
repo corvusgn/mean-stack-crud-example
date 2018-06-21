@@ -112,12 +112,14 @@ node {
                         gcloud auth activate-service-account --key-file=\"$GOOGLE_KUBE_CREDS\"
                         gcloud container clusters get-credentials omni-cluster --zone ${zone} --project ${projectName}
                         if helm status ${releaseName} >> /dev/null; then 
-                            echo "install"
-                            helm install -n ${env.releaseName} --namespace ${branchName} .
-                        else 
-                            echo "upgrade"
+                            echo "${releaseName}"
+                            echo "${env.releaseName}"
                             helm upgrade --dry-run ${env.releaseName} .
                             helm upgrade --set ${env.imageName}.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} --namespace ${branchName} .
+                        else
+                            echo "${releaseName}"
+                            echo "${env.releaseName}"
+                            helm install -n ${env.releaseName} --namespace ${branchName} . 
                         fi
                 '''
 //              sh "helm status ${env.releaseName} || helm install -n ${env.releaseName} --namespace ${branchName} . && helm upgrade --set ${env.imageName}.image.tag=${imageTag} ${env.releaseName} --namespace ${branchName} ."
